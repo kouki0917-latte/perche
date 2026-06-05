@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Perche — 豆在庫表</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', sans-serif;
+      background: #f7f5f2;
+      color: #2c2c2c;
+      min-height: 100vh;
+    }
+
+    header {
+      background: #2c2c2c;
+      color: #f7f5f2;
+      padding: 24px 40px;
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+    }
+
+    header h1 { font-size: 22px; font-weight: 600; letter-spacing: 0.08em; }
+    header span { font-size: 13px; color: #aaa; letter-spacing: 0.05em; }
+
+    .updated { margin-left: auto; font-size: 12px; color: #888; }
+
+    main { padding: 40px; max-width: 1100px; margin: 0 auto; }
+
+    /* 設定バナー（CSV URLが未設定の時だけ表示） */
+    .setup-banner {
+      background: #fff8e1;
+      border: 1px solid #ffe082;
+      border-radius: 8px;
+      padding: 20px 24px;
+      margin-bottom: 28px;
+      font-size: 14px;
+      line-height: 1.8;
+    }
+    .setup-banner h2 { font-size: 15px; margin-bottom: 8px; color: #b45309; }
+    .setup-banner code {
+      background: #f5f5f5;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 13px;
+    }
+
+    .table-wrap {
+      background: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
+
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+
+    thead tr { background: #2c2c2c; color: #f7f5f2; }
+    thead th {
+      padding: 14px 20px;
+      text-align: left;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      font-size: 12px;
+      text-transform: uppercase;
+    }
+
+    tbody tr { border-bottom: 1px solid #f0ede8; transition: background 0.15s; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: #faf8f5; }
+
+    td { padding: 16px 20px; vertical-align: middle; }
+
+    .bean-name { font-weight: 600; font-size: 15px; }
+    .bean-origin { font-size: 12px; color: #888; margin-top: 2px; }
+
+    .stock-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .stock-ok  { background: #e6f4ea; color: #2d7a3a; }
+    .stock-low { background: #fff3e0; color: #b85c00; }
+    .stock-out { background: #fdecea; color: #c0392b; }
+
+    .price { font-weight: 600; font-size: 15px; }
+    .price-unit { font-size: 11px; color: #aaa; margin-left: 2px; }
+
+    .flavor-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+    .tag {
+      background: #f0ede8;
+      color: #5a4e42;
+      border-radius: 4px;
+      padding: 3px 8px;
+      font-size: 12px;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 60px;
+      color: #aaa;
+      font-size: 14px;
+    }
+
+    .error-msg {
+      background: #fdecea;
+      color: #c0392b;
+      border-radius: 8px;
+      padding: 20px 24px;
+      font-size: 14px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 32px;
+      font-size: 12px;
+      color: #bbb;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Perche</h1>
+  <span>豆 在庫表</span>
+  <div class="updated" id="updated-date"></div>
+</header>
+
+<main>
+  <div id="setup-banner" class="setup-banner" style="display:none">
+    <h2>⚙️ 管理者設定：Google スプレッドシートを接続してください</h2>
+    以下の手順でCSV URLを取得し、このファイルの <code>SHEET_CSV_URL</code> に貼り付けてください。<br><br>
+    1. Google スプレッドシートを開く<br>
+    2. メニュー「ファイル → 共有 → ウェブに公開」<br>
+    3. 「シート1」「カンマ区切り形式（.csv）」を選択 → 「公開」<br>
+    4. 表示されたURLをコピーして、index.html の <code>SHEET_CSV_URL</code> に貼り付ける
+  </div>
+
+  <div id="content">
+    <div class="loading">読み込み中...</div>
+  </div>
+</main>
+
+<footer>
+  &copy; Perche — 卸先専用 在庫共有ページ
+</footer>
+
+<script>
+  // =====================================================
+  // ▼ ここにGoogle スプレッドシートのCSV公開URLを貼る
+  // =====================================================
+  const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSzjVZE88W7PXJJq7sOOfMnxluatPEtBPJ_fjhZoHxblXjrgF1eIZ3RYEnX36ZfZEcfcikrqdgrvqHj/pub?output=csv';
+  // =====================================================
+
+  // スプレッドシートの列順
+  // A: 豆詳細, B: 在庫, C: 1バッチ値段, D: フレーバー(「,」区切り)
+
+  const COL = { NAME: 0, STOCK: 1, PRICE: 2, FLAVORS: 3 };
+
+  function stockClass(kg) {
+    const n = parseFloat(kg);
+    if (isNaN(n) || n <= 0) return 'stock-out';
+    if (n <= 5) return 'stock-low';
+    return 'stock-ok';
+  }
+
+  function stockLabel(kg) {
+    const n = parseFloat(kg);
+    if (isNaN(n) || n <= 0) return '在庫なし';
+    return n + ' kg';
+  }
+
+  function renderTable(rows) {
+    const tbody = rows.slice(1).map(cols => {
+      if (cols.every(c => !c.trim())) return '';
+      const flavors = (cols[COL.FLAVORS] || '')
+        .split(',')
+        .map(f => f.trim())
+        .filter(Boolean)
+        .map(f => `<span class="tag">${f}</span>`)
+        .join('');
+
+      const price = parseInt(cols[COL.PRICE], 10);
+      const priceStr = isNaN(price) ? '-' : price.toLocaleString();
+
+      return `
+        <tr>
+          <td>
+            <div class="bean-name">${cols[COL.NAME] || '-'}</div>
+          </td>
+          <td>
+            <span class="stock-badge ${stockClass(cols[COL.STOCK])}">
+              ${stockLabel(cols[COL.STOCK])}
+            </span>
+          </td>
+          <td>
+            <span class="price">${priceStr}</span>
+            <span class="price-unit">円 / 1バッチ</span>
+          </td>
+          <td><div class="flavor-tags">${flavors}</div></td>
+        </tr>`;
+    }).join('');
+
+    return `
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>豆詳細</th>
+              <th>在庫</th>
+              <th>1バッチ値段（税抜）</th>
+              <th>フレーバー</th>
+            </tr>
+          </thead>
+          <tbody>${tbody}</tbody>
+        </table>
+      </div>`;
+  }
+
+  function parseCSV(text) {
+    return text.trim().split('\n').map(line => {
+      const result = [];
+      let cur = '', inQ = false;
+      for (let i = 0; i < line.length; i++) {
+        const ch = line[i];
+        if (ch === '"') { inQ = !inQ; }
+        else if (ch === ',' && !inQ) { result.push(cur); cur = ''; }
+        else { cur += ch; }
+      }
+      result.push(cur);
+      return result;
+    });
+  }
+
+  async function load() {
+    const content = document.getElementById('content');
+
+    if (!SHEET_CSV_URL) {
+      document.getElementById('setup-banner').style.display = 'block';
+      content.innerHTML = '';
+      return;
+    }
+
+    try {
+      const res = await fetch(SHEET_CSV_URL);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const text = await res.text();
+      const rows = parseCSV(text);
+      content.innerHTML = renderTable(rows);
+      document.getElementById('updated-date').textContent =
+        '最終更新: ' + new Date().toLocaleDateString('ja-JP', { year:'numeric', month:'long', day:'numeric' });
+    } catch (e) {
+      content.innerHTML = `<div class="error-msg">
+        データの読み込みに失敗しました。CSV URLを確認してください。<br>
+        <small>${e.message}</small>
+      </div>`;
+    }
+  }
+
+  load();
+</script>
+
+</body>
+</html>
