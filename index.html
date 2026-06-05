@@ -17,26 +17,111 @@
     header {
       background: #2c2c2c;
       color: #f7f5f2;
-      padding: 24px 40px;
+      padding: 20px 24px;
       display: flex;
-      align-items: baseline;
-      gap: 16px;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
     }
 
-    header h1 { font-size: 22px; font-weight: 600; letter-spacing: 0.08em; }
-    header span { font-size: 13px; color: #aaa; letter-spacing: 0.05em; }
-
+    header h1 { font-size: 20px; font-weight: 700; letter-spacing: 0.08em; }
+    header span { font-size: 13px; color: #aaa; }
     .updated { margin-left: auto; font-size: 12px; color: #888; }
 
-    main { padding: 40px; max-width: 1100px; margin: 0 auto; }
+    main { padding: 20px 16px; max-width: 1100px; margin: 0 auto; }
 
-    /* 設定バナー（CSV URLが未設定の時だけ表示） */
+    /* ---- カードリスト（スマホ） ---- */
+    .card-list { display: flex; flex-direction: column; gap: 12px; }
+
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 16px 18px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .bean-name { font-weight: 700; font-size: 16px; }
+
+    .stock-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .stock-ok  { background: #e6f4ea; color: #2d7a3a; }
+    .stock-low { background: #fff3e0; color: #b85c00; }
+    .stock-out { background: #fdecea; color: #c0392b; }
+
+    .card-meta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 10px;
+      font-size: 13px;
+      color: #666;
+    }
+
+    .price-val { font-weight: 700; font-size: 15px; color: #2c2c2c; }
+
+    .flavor-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+    .tag {
+      background: #f0ede8;
+      color: #5a4e42;
+      border-radius: 4px;
+      padding: 3px 9px;
+      font-size: 12px;
+    }
+
+    /* ---- テーブル（PC） ---- */
+    .table-wrap {
+      background: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+      display: none;
+    }
+
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    thead tr { background: #2c2c2c; color: #f7f5f2; }
+    thead th {
+      padding: 14px 20px;
+      text-align: left;
+      font-weight: 500;
+      font-size: 12px;
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+    }
+    tbody tr { border-bottom: 1px solid #f0ede8; transition: background 0.15s; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: #faf8f5; }
+    td { padding: 16px 20px; vertical-align: middle; }
+    .price { font-weight: 600; font-size: 15px; }
+    .price-unit { font-size: 11px; color: #aaa; margin-left: 2px; }
+
+    /* ---- レスポンシブ切り替え ---- */
+    @media (min-width: 680px) {
+      main { padding: 40px; }
+      .card-list { display: none; }
+      .table-wrap { display: block; }
+    }
+
+    /* ---- その他 ---- */
     .setup-banner {
       background: #fff8e1;
       border: 1px solid #ffe082;
       border-radius: 8px;
       padding: 20px 24px;
-      margin-bottom: 28px;
+      margin-bottom: 20px;
       font-size: 14px;
       line-height: 1.8;
     }
@@ -49,63 +134,7 @@
       font-size: 13px;
     }
 
-    .table-wrap {
-      background: #fff;
-      border-radius: 8px;
-      overflow: hidden;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-    }
-
-    table { width: 100%; border-collapse: collapse; font-size: 14px; }
-
-    thead tr { background: #2c2c2c; color: #f7f5f2; }
-    thead th {
-      padding: 14px 20px;
-      text-align: left;
-      font-weight: 500;
-      letter-spacing: 0.05em;
-      font-size: 12px;
-      text-transform: uppercase;
-    }
-
-    tbody tr { border-bottom: 1px solid #f0ede8; transition: background 0.15s; }
-    tbody tr:last-child { border-bottom: none; }
-    tbody tr:hover { background: #faf8f5; }
-
-    td { padding: 16px 20px; vertical-align: middle; }
-
-    .bean-name { font-weight: 600; font-size: 15px; }
-    .bean-origin { font-size: 12px; color: #888; margin-top: 2px; }
-
-    .stock-badge {
-      display: inline-block;
-      padding: 4px 10px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 600;
-    }
-    .stock-ok  { background: #e6f4ea; color: #2d7a3a; }
-    .stock-low { background: #fff3e0; color: #b85c00; }
-    .stock-out { background: #fdecea; color: #c0392b; }
-
-    .price { font-weight: 600; font-size: 15px; }
-    .price-unit { font-size: 11px; color: #aaa; margin-left: 2px; }
-
-    .flavor-tags { display: flex; flex-wrap: wrap; gap: 6px; }
-    .tag {
-      background: #f0ede8;
-      color: #5a4e42;
-      border-radius: 4px;
-      padding: 3px 8px;
-      font-size: 12px;
-    }
-
-    .loading {
-      text-align: center;
-      padding: 60px;
-      color: #aaa;
-      font-size: 14px;
-    }
+    .loading { text-align: center; padding: 60px; color: #aaa; font-size: 14px; }
 
     .error-msg {
       background: #fdecea;
@@ -157,67 +186,69 @@
   const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSzjVZE88W7PXJJq7sOOfMnxluatPEtBPJ_fjhZoHxblXjrgF1eIZ3RYEnX36ZfZEcfcikrqdgrvqHj/pub?output=csv';
   // =====================================================
 
-  // スプレッドシートの列順
   // A: 豆詳細, B: 在庫, C: 1バッチ値段, D: フレーバー(「,」区切り)
-
   const COL = { NAME: 0, STOCK: 1, PRICE: 2, FLAVORS: 3 };
 
-  function stockClass(kg) {
-    const n = parseFloat(kg);
+  function stockClass(val) {
+    const n = parseFloat(val);
     if (isNaN(n) || n <= 0) return 'stock-out';
     if (n <= 5) return 'stock-low';
     return 'stock-ok';
   }
 
-  function stockLabel(kg) {
-    const n = parseFloat(kg);
+  function stockLabel(val) {
+    const n = parseFloat(val);
     if (isNaN(n) || n <= 0) return '在庫なし';
     return n + ' kg';
   }
 
-  function renderTable(rows) {
-    const tbody = rows.slice(1).map(cols => {
-      if (cols.every(c => !c.trim())) return '';
-      const flavors = (cols[COL.FLAVORS] || '')
-        .split(',')
-        .map(f => f.trim())
-        .filter(Boolean)
-        .map(f => `<span class="tag">${f}</span>`)
-        .join('');
+  function flavorTags(val) {
+    return (val || '').split(',').map(f => f.trim()).filter(Boolean)
+      .map(f => `<span class="tag">${f}</span>`).join('');
+  }
 
+  function render(rows) {
+    const data = rows.slice(1).filter(cols => !cols.every(c => !c.trim()));
+
+    // カード（スマホ）
+    const cards = data.map(cols => {
       const price = parseInt(cols[COL.PRICE], 10);
       const priceStr = isNaN(price) ? '-' : price.toLocaleString();
+      return `
+        <div class="card">
+          <div class="card-header">
+            <div class="bean-name">${cols[COL.NAME] || '-'}</div>
+            <span class="stock-badge ${stockClass(cols[COL.STOCK])}">${stockLabel(cols[COL.STOCK])}</span>
+          </div>
+          <div class="card-meta">
+            <span class="price-val">${priceStr}円</span>
+            <span>/ 1バッチ（税抜）</span>
+          </div>
+          <div class="flavor-tags">${flavorTags(cols[COL.FLAVORS])}</div>
+        </div>`;
+    }).join('');
 
+    // テーブル（PC）
+    const trows = data.map(cols => {
+      const price = parseInt(cols[COL.PRICE], 10);
+      const priceStr = isNaN(price) ? '-' : price.toLocaleString();
       return `
         <tr>
-          <td>
-            <div class="bean-name">${cols[COL.NAME] || '-'}</div>
-          </td>
-          <td>
-            <span class="stock-badge ${stockClass(cols[COL.STOCK])}">
-              ${stockLabel(cols[COL.STOCK])}
-            </span>
-          </td>
-          <td>
-            <span class="price">${priceStr}</span>
-            <span class="price-unit">円 / 1バッチ</span>
-          </td>
-          <td><div class="flavor-tags">${flavors}</div></td>
+          <td><div class="bean-name">${cols[COL.NAME] || '-'}</div></td>
+          <td><span class="stock-badge ${stockClass(cols[COL.STOCK])}">${stockLabel(cols[COL.STOCK])}</span></td>
+          <td><span class="price">${priceStr}</span><span class="price-unit">円 / 1バッチ</span></td>
+          <td><div class="flavor-tags">${flavorTags(cols[COL.FLAVORS])}</div></td>
         </tr>`;
     }).join('');
 
     return `
+      <div class="card-list">${cards}</div>
       <div class="table-wrap">
         <table>
-          <thead>
-            <tr>
-              <th>豆詳細</th>
-              <th>在庫</th>
-              <th>1バッチ値段（税抜）</th>
-              <th>フレーバー</th>
-            </tr>
-          </thead>
-          <tbody>${tbody}</tbody>
+          <thead><tr>
+            <th>豆詳細</th><th>在庫</th><th>1バッチ値段（税抜）</th><th>フレーバー</th>
+          </tr></thead>
+          <tbody>${trows}</tbody>
         </table>
       </div>`;
   }
@@ -226,8 +257,7 @@
     return text.trim().split('\n').map(line => {
       const result = [];
       let cur = '', inQ = false;
-      for (let i = 0; i < line.length; i++) {
-        const ch = line[i];
+      for (const ch of line) {
         if (ch === '"') { inQ = !inQ; }
         else if (ch === ',' && !inQ) { result.push(cur); cur = ''; }
         else { cur += ch; }
@@ -239,26 +269,20 @@
 
   async function load() {
     const content = document.getElementById('content');
-
     if (!SHEET_CSV_URL) {
       document.getElementById('setup-banner').style.display = 'block';
       content.innerHTML = '';
       return;
     }
-
     try {
       const res = await fetch(SHEET_CSV_URL);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const text = await res.text();
-      const rows = parseCSV(text);
-      content.innerHTML = renderTable(rows);
+      const rows = parseCSV(await res.text());
+      content.innerHTML = render(rows);
       document.getElementById('updated-date').textContent =
         '最終更新: ' + new Date().toLocaleDateString('ja-JP', { year:'numeric', month:'long', day:'numeric' });
     } catch (e) {
-      content.innerHTML = `<div class="error-msg">
-        データの読み込みに失敗しました。CSV URLを確認してください。<br>
-        <small>${e.message}</small>
-      </div>`;
+      content.innerHTML = `<div class="error-msg">データの読み込みに失敗しました。CSV URLを確認してください。<br><small>${e.message}</small></div>`;
     }
   }
 
